@@ -1,4 +1,7 @@
 from constants import MAC_CHROME_DRIVER
+import time
+from selenium.webdriver.common.by import By
+import re
 
 def initbrowser(url=None, hidebrowser=False):
 
@@ -111,7 +114,7 @@ def findPageLinks(browser):
         while True:
             browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
             # Scroll up until you find pages
-            pages = browser.find_elements_by_xpath("//a[contains(@href, 'read-test')]")
+            pages = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")
 
             # Get hrefs (urls)
             pages = [p.get_property('href') for p in pages if not re.search('Read|^$', p.text, re.I)]
