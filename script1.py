@@ -26,7 +26,7 @@ if __name__ == "__main__":
     browser = initbrowser(url_home)
 
     # Sleep while browser loads
-    timesleep = 5
+    timesleep = 2
     for i in range(timesleep):
         print(f"Sleep: {i} of {timesleep}")
         time.sleep(1)
@@ -47,69 +47,89 @@ if __name__ == "__main__":
     # Init DF
     df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
 
-    
+    # Get next page link
+
     # Get pages
     #pages = browser.find_elements_by_xpath("//a[contains(@href, 'read-test')]")
     #pages = [p for p in pages if p.text != '']
+    def processSingleTestimonial(blue):
 
-    pages = findPageLinks(browser)
+        """ A blue is a single 'blue' frame (cell) that holds a testimonial
+            Returns a tuple (testimonial, estab) holding the text of the testimonial and the
+                name of the establishment (this second element has since been removed from the website)
+            
+        """
+
+        # Initialise text and establishment
+        text = ''
+        estab = ''
+
+        # texts
+        texts = blue.find_elements(By.XPATH, ".//p[@class='preFade fadeIn']")
+
+        # If there is text
+        if len(texts) > 0:
+
+            # Testimonial (extract)
+            text = texts[0].text
+
+            if len(texts)>1:
+                estab = texts[1].text
+        
+            # Append next testimonial to a list
+            return text, estab
+        else:
+            return None, None
+            
+            
+
+    def getTestimonials(browser, firstPage=False):
+
+        # Initialise list of dataframe rows
+        dfs = []
+
+        # 
+        if not firstPage:
+            print("Not first page")
+        
+        # First page
+        else:
+
+            # Print message
+            print("First page: Go to top of page")
+            browser.execute_script("window.scrollTo(0, 0)")
+            time.sleep(1.5)
+
+        # Scroll down entire page, loading up testimonials
+        print(f"Scrolling page: {browser.current_url}")
+        scrollDown(browser)
+
+        # Get testimonials - in blue frames
+        blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
+        
+
+        # For each (blue) cell - get testimonial
+        for blue in blues:
+
+            # Process a single blue frame, looking for testimonials
+            testimonial, estab = processSingleTestimonial(blue)
+
+            # If a testimonial was returned, add it to the list
+            if testimonial is not None: 
+                dfs.append([testimonial, estab, browser.current_url])
+        
+        return dfs
+
+    # Get the next page
+    nextPage = findPageLinks(browser)
     print("Sleep 2")
     time.sleep(2)
 
-    
-    # Iterate through all pages
-    for i in range(len(pages)):
+    # Get testimonials from a single page
+    pageTestimonials = getTestimonials(browser, True)
 
-        # If url already in df - pass
-        if len(df.query("url=='{}'".format(pages[i]))) > 0:
-            pass
-
-        # Else, new URL - process it
-        else:
-                
-            # If first page we don't need to click
-            if i>0:
-                print("Loading page {}".format(pages[i]))
-                browser.get(pages[i])
-
-            # Else, Page 0 (1) go to top
-            else:
-                print("First page = {}, need to get testimonials".format(i))
-                print("\tGo to top of page")
-
-                # Top of page and wait
-                browser.execute_script("window.scrollTo(0, 0)")
-                time.sleep(1.5)
-                #ch = input("Continue?")
-
-
-            # Scroll through page so testimonials load up
-            scrollDown(browser)
-
-            # Get testimonials - in blue frames
-            blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
-
-            print("\tGetting testimonials")
-            # For each cell - get testimonial
-            for b in blues:
-                text = ''
-                estab = ''
-                
-                # texts
-                texts = b.find_elements(By.XPATH, ".//p[@class='preFade fadeIn']")
-                if len(texts) > 0:
-                    # Testimonial
-                    text = texts[0].text
-
-                    if len(texts)>1:
-                        estab = texts[1].text
-                
-                    df = df.append(pd.DataFrame(data=[[text,estab,pages[i]]], columns=df.columns))
-            time.sleep(1)        
-            print(df.shape)
-            
-    # Reset index
-    df = df.reset_index()
+    # Convert into dataframe
+    df = df.append(pd.DataFrame(pageTestimonials, columns=df.columns))
 
     # Output to csv
     print("Let us save a text file with the data")
