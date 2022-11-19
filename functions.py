@@ -125,4 +125,25 @@ def findPageLinks(browser):
             if numpages > 0:
                 return pages
 
-        
+def scrollDown(driver):
+        """Credit: https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python"""
+        SCROLL_PAUSE_TIME = 1
+
+        # Get scroll height
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        #print(last_height)
+
+        while True:
+            # Scroll down to bottom
+            #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            browser.execute_script("window.scrollTo(0, window.scrollY + 1500)")
+            # Wait to load page
+            time.sleep(SCROLL_PAUSE_TIME)
+
+            # Calculate new scroll height and compare with last scroll height
+            #new_height = driver.execute_script("return document.body.scrollHeight")
+            new_height = driver.execute_script("return window.scrollY")
+            #print(new_height)
+            if new_height == last_height:
+                break
+            last_height = new_height
