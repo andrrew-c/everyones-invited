@@ -17,7 +17,7 @@ import re
 if __name__ == "__main__":
         
     #url_home = "https://www.everyonesinvited.uk/"
-    url_home = "https://www.everyonesinvited.uk/read-testimonies-page-1"
+    url_home = "https://www.everyonesinvited.uk/read"
 
     ## Date in yyyy-mm-dd format
     date = datetime.now().strftime("%Y-%m-%d")
