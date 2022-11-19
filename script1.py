@@ -26,7 +26,7 @@ if __name__ == "__main__":
     browser = initbrowser(url_home)
 
     # Sleep while browser loads
-    timesleep = 2
+    timesleep = 5
     for i in range(timesleep):
         print(f"Sleep: {i} of {timesleep}")
         time.sleep(1)
