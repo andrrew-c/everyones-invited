@@ -114,10 +114,11 @@ def findPageLinks(browser):
         while True:
             browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
             # Scroll up until you find pages
-            pages = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")
+            nextPage = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")[0]
+            return nextPage
 
             # Get hrefs (urls)
-            pages = [p.get_property('href') for p in pages if not re.search('Read|^$', p.text, re.I)]
+            # nextPage = [p.get_property('href') for p in pages if not re.search('Read|^$', p.text, re.I)]
 
             # Reverse list
             #pages = pages[::-1]
@@ -136,14 +137,21 @@ def scrollDown(driver):
         while True:
             # Scroll down to bottom
             #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            browser.execute_script("window.scrollTo(0, window.scrollY + 1500)")
+            driver.execute_script("window.scrollTo(0, window.scrollY + 1500)")
             # Wait to load page
             time.sleep(SCROLL_PAUSE_TIME)
 
             # Calculate new scroll height and compare with last scroll height
             #new_height = driver.execute_script("return document.body.scrollHeight")
             new_height = driver.execute_script("return window.scrollY")
-            #print(new_height)
+
+            # Use this line to debug if the script is stuck on scrolling
+            # print(f"New height = {new_height}, last height = {last_height}")
+
+            # Check whether the current (new) height is the same as the previous (last)
+            # When True, this suggests that the browser has reached the end of the page.
             if new_height == last_height:
                 break
-            last_height = new_height
+            else: 
+                # Update previous (last) height
+                last_height = new_height
