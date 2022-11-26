@@ -49,6 +49,7 @@ if __name__ == "__main__":
 
     # Get next page link
 
+
     # Get pages
     #pages = browser.find_elements_by_xpath("//a[contains(@href, 'read-test')]")
     #pages = [p for p in pages if p.text != '']
@@ -83,7 +84,7 @@ if __name__ == "__main__":
             
             
 
-    def getTestimonials(browser, firstPage=False):
+    def getTestimonials(browser, colNames, firstPage=False):
 
         # Initialise list of dataframe rows
         dfs = []
@@ -117,20 +118,28 @@ if __name__ == "__main__":
             # If a testimonial was returned, add it to the list
             if testimonial is not None: 
                 dfs.append([testimonial, estab, browser.current_url])
-        
-        return dfs
+
+            
+        # Produce dataframe from list
+        df = pd.DataFrame(data=dfs, columns=colNames)
+        return df
 
     # Get the next page
-    nextPage = findPageLinks(browser)
-    print("Sleep 2")
-    time.sleep(2)
+    # nextPage = findPageLinks(browser)
+    # print("Sleep 2")
+    # time.sleep(2)
 
-    # Get testimonials from a single page
-    pageTestimonials = getTestimonials(browser, True)
+    do while True:
 
-    # Convert into dataframe
-    df = df.append(pd.DataFrame(pageTestimonials, columns=df.columns))
+        # Get testimonials from a single page
+        pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
+
+        # Add to existing dataframe
+        df = pd.concat([df, pageTestimonials])
+
+        # Get next page
+        nextPage = findPageLinks(browser)
 
     # Output to csv
-    print("Let us save a text file with the data")
-    df.to_csv('testimonials-{}.txt'.format(date), sep='|', index=False)
+    # print("Let us save a text file with the data")
+    # df.to_csv('testimonials-{}.txt'.format(date), sep='|', index=False)
