@@ -127,34 +127,34 @@ def findPageLinks(browser):
                 return pages
 
 def scrollDown(driver):
-        """Credit: https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python"""
-        SCROLL_PAUSE_TIME = 1
+    """Credit: https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python"""
+    SCROLL_PAUSE_TIME = 1
 
-        # Get scroll height
-        last_height = driver.execute_script("return document.body.scrollHeight")
-        #print(last_height)
+    # Get scroll height
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    #print(last_height)
 
-        while True:
-            # Scroll down to bottom
-            #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            driver.execute_script("window.scrollTo(0, window.scrollY + 1500)")
-            # Wait to load page
-            time.sleep(SCROLL_PAUSE_TIME)
+    while True:
+        # Scroll down to bottom
+        #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        driver.execute_script("window.scrollTo(0, window.scrollY + 1500)")
+        # Wait to load page
+        time.sleep(SCROLL_PAUSE_TIME)
 
-            # Calculate new scroll height and compare with last scroll height
-            #new_height = driver.execute_script("return document.body.scrollHeight")
-            new_height = driver.execute_script("return window.scrollY")
+        # Calculate new scroll height and compare with last scroll height
+        #new_height = driver.execute_script("return document.body.scrollHeight")
+        new_height = driver.execute_script("return window.scrollY")
 
-            # Use this line to debug if the script is stuck on scrolling
-            # print(f"New height = {new_height}, last height = {last_height}")
+        # Use this line to debug if the script is stuck on scrolling
+        # print(f"New height = {new_height}, last height = {last_height}")
 
-            # Check whether the current (new) height is the same as the previous (last)
-            # When True, this suggests that the browser has reached the end of the page.
-            if new_height == last_height:
-                break
-            else: 
-                # Update previous (last) height
-                last_height = new_height
+        # Check whether the current (new) height is the same as the previous (last)
+        # When True, this suggests that the browser has reached the end of the page.
+        if new_height == last_height:
+            break
+        else: 
+            # Update previous (last) height
+            last_height = new_height
 
 
 # Get pages
@@ -189,60 +189,60 @@ def processSingleTestimonial(blue):
 
 def getTestimonials(browser, colNames, firstPage=False, stopEarly=-1):
 
-""" On a single browser page, scroll down collecting each testimonial
-    Returns a pandas dataframe 
+    """ On a single browser page, scroll down collecting each testimonial
+        Returns a pandas dataframe 
 
-    Scrolls down to the end of the page and then processes each blue frame (a blue)
+        Scrolls down to the end of the page and then processes each blue frame (a blue)
 
-    stopEarly - Integer - stops processing page after N testimonials have been selected
-                Default -1
+        stopEarly - Integer - stops processing page after N testimonials have been selected
+                    Default -1
 
-"""
+    """
 
-# Initialise list of dataframe rows
-dfs = []
+    # Initialise list of dataframe rows
+    dfs = []
 
-# Init counter for stopEarly
-iCount = 0
+    # Init counter for stopEarly
+    iCount = 0
 
-# 
-if not firstPage:
-    print("Not first page")
+    # 
+    if not firstPage:
+        print("Not first page")
 
-# First page
-else:
+    # First page
+    else:
 
-    # Print message
-    print("First page: Go to top of page")
-    browser.execute_script("window.scrollTo(0, 0)")
-    time.sleep(1.5)
+        # Print message
+        print("First page: Go to top of page")
+        browser.execute_script("window.scrollTo(0, 0)")
+        time.sleep(1.5)
 
-# Scroll down entire page, loading up testimonials
-print(f"Scrolling page: {browser.current_url}")
-scrollDown(browser)
+    # Scroll down entire page, loading up testimonials
+    print(f"Scrolling page: {browser.current_url}")
+    scrollDown(browser)
 
-# Get testimonials - in blue frames
-blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
-
-
-# For each (blue) cell - get testimonial
-for blue in blues:
-
-    # Iterate counter by 1
-    iCounter += 1
-
-    # Process a single blue frame, looking for testimonials
-    testimonial, estab = processSingleTestimonial(blue)
-
-    # If a testimonial was returned, add it to the list
-    if testimonial is not None: 
-        dfs.append([testimonial, estab, browser.current_url])
+    # Get testimonials - in blue frames
+    blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
 
 
-    if iCounter !=-1 and iCounter > stopEarly:
-        break
+    # For each (blue) cell - get testimonial
+    for blue in blues:
 
-    
-# Produce dataframe from list
-df = pd.DataFrame(data=dfs, columns=colNames)
-return df
+        # Iterate counter by 1
+        iCounter += 1
+
+        # Process a single blue frame, looking for testimonials
+        testimonial, estab = processSingleTestimonial(blue)
+
+        # If a testimonial was returned, add it to the list
+        if testimonial is not None: 
+            dfs.append([testimonial, estab, browser.current_url])
+
+
+        if iCounter !=-1 and iCounter > stopEarly:
+            break
+
+        
+    # Produce dataframe from list
+    df = pd.DataFrame(data=dfs, columns=colNames)
+    return df
