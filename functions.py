@@ -157,78 +157,92 @@ def scrollDown(driver):
                 last_height = new_height
 
 
-    # Get pages
-    def processSingleTestimonial(blue):
+# Get pages
+def processSingleTestimonial(blue):
 
-        """ A blue is a single 'blue' frame (cell) that holds a testimonial
-            Returns a tuple (testimonial, estab) holding the text of the testimonial and the
-                name of the establishment (this second element has since been removed from the website)
-            
-        """
-
-        # Initialise text and establishment
-        text = ''
-        estab = ''
-
-        # texts
-        texts = blue.find_elements(By.XPATH, ".//p[@class='preFade fadeIn']")
-
-        # If there is text
-        if len(texts) > 0:
-
-            # Testimonial (extract)
-            text = texts[0].text
-
-            if len(texts)>1:
-                estab = texts[1].text
+    """ A blue is a single 'blue' frame (cell) that holds a testimonial
+        Returns a tuple (testimonial, estab) holding the text of the testimonial and the
+            name of the establishment (this second element has since been removed from the website)
         
-            # Append next testimonial to a list
-            return text, estab
-        else:
-            return None, None
-   def getTestimonials(browser, colNames, firstPage=False):
+    """
 
-        """ On a single browser page, scroll down collecting each testimonial
-            Returns a pandas dataframe 
+    # Initialise text and establishment
+    text = ''
+    estab = ''
 
-            Scrolls down to the end of the page and then processes each blue frame (a blue)
+    # texts
+    texts = blue.find_elements(By.XPATH, ".//p[@class='preFade fadeIn']")
 
-        """
+    # If there is text
+    if len(texts) > 0:
 
-        # Initialise list of dataframe rows
-        dfs = []
+        # Testimonial (extract)
+        text = texts[0].text
 
-        # 
-        if not firstPage:
-            print("Not first page")
-        
-        # First page
-        else:
+        if len(texts)>1:
+            estab = texts[1].text
+    
+        # Append next testimonial to a list
+        return text, estab
+    else:
+        return None, None
 
-            # Print message
-            print("First page: Go to top of page")
-            browser.execute_script("window.scrollTo(0, 0)")
-            time.sleep(1.5)
+def getTestimonials(browser, colNames, firstPage=False, stopEarly=-1):
 
-        # Scroll down entire page, loading up testimonials
-        print(f"Scrolling page: {browser.current_url}")
-        scrollDown(browser)
+""" On a single browser page, scroll down collecting each testimonial
+    Returns a pandas dataframe 
 
-        # Get testimonials - in blue frames
-        blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
-        
+    Scrolls down to the end of the page and then processes each blue frame (a blue)
 
-        # For each (blue) cell - get testimonial
-        for blue in blues:
+    stopEarly - Integer - stops processing page after N testimonials have been selected
+                Default -1
 
-            # Process a single blue frame, looking for testimonials
-            testimonial, estab = processSingleTestimonial(blue)
+"""
 
-            # If a testimonial was returned, add it to the list
-            if testimonial is not None: 
-                dfs.append([testimonial, estab, browser.current_url])
+# Initialise list of dataframe rows
+dfs = []
 
-            
-        # Produce dataframe from list
-        df = pd.DataFrame(data=dfs, columns=colNames)
-        return df
+# Init counter for stopEarly
+iCount = 0
+
+# 
+if not firstPage:
+    print("Not first page")
+
+# First page
+else:
+
+    # Print message
+    print("First page: Go to top of page")
+    browser.execute_script("window.scrollTo(0, 0)")
+    time.sleep(1.5)
+
+# Scroll down entire page, loading up testimonials
+print(f"Scrolling page: {browser.current_url}")
+scrollDown(browser)
+
+# Get testimonials - in blue frames
+blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
+
+
+# For each (blue) cell - get testimonial
+for blue in blues:
+
+    # Iterate counter by 1
+    iCounter += 1
+
+    # Process a single blue frame, looking for testimonials
+    testimonial, estab = processSingleTestimonial(blue)
+
+    # If a testimonial was returned, add it to the list
+    if testimonial is not None: 
+        dfs.append([testimonial, estab, browser.current_url])
+
+
+    if iCounter !=-1 and iCounter > stopEarly:
+        break
+
+    
+# Produce dataframe from list
+df = pd.DataFrame(data=dfs, columns=colNames)
+return df
