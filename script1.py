@@ -61,6 +61,12 @@ if __name__ == "__main__":
         # Get next page
         nextPage = findPageLinks(browser)
 
+        # Click next page
+        if len(nextPage)==1:
+            nextPage[0].click()
+
+        break
+
     # Output to csv
     # print("Let us save a text file with the data")
     # df.to_csv('testimonials-{}.txt'.format(date), sep='|', index=False)
