@@ -47,13 +47,14 @@ if __name__ == "__main__":
     # Init DF
     df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
 
-    # Get next page link
-
-
- 
-            
-
     def getTestimonials(browser, colNames, firstPage=False):
+
+        """ On a single browser page, scroll down collecting each testimonial
+            Returns a pandas dataframe 
+
+            Scrolls down to the end of the page and then processes each blue frame (a blue)
+
+        """
 
         # Initialise list of dataframe rows
         dfs = []
@@ -93,11 +94,7 @@ if __name__ == "__main__":
         df = pd.DataFrame(data=dfs, columns=colNames)
         return df
 
-    # Get the next page
-    # nextPage = findPageLinks(browser)
-    # print("Sleep 2")
-    # time.sleep(2)
-
+    # Main loop
     do while True:
 
         # Get testimonials from a single page
