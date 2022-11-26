@@ -2,6 +2,7 @@ from constants import MAC_CHROME_DRIVER
 import time
 from selenium.webdriver.common.by import By
 import re
+import pandas as pd
 
 def initbrowser(url=None, hidebrowser=False):
 
@@ -187,7 +188,7 @@ def processSingleTestimonial(blue):
     else:
         return None, None
 
-def getTestimonials(browser, colNames, firstPage=False, stopEarly=-1):
+def getTestimonials(browser, colNames, firstPage=False):
 
     """ On a single browser page, scroll down collecting each testimonial
         Returns a pandas dataframe 
@@ -201,9 +202,6 @@ def getTestimonials(browser, colNames, firstPage=False, stopEarly=-1):
 
     # Initialise list of dataframe rows
     dfs = []
-
-    # Init counter for stopEarly
-    iCount = 0
 
     # 
     if not firstPage:
@@ -228,20 +226,12 @@ def getTestimonials(browser, colNames, firstPage=False, stopEarly=-1):
     # For each (blue) cell - get testimonial
     for blue in blues:
 
-        # Iterate counter by 1
-        iCounter += 1
-
         # Process a single blue frame, looking for testimonials
         testimonial, estab = processSingleTestimonial(blue)
 
         # If a testimonial was returned, add it to the list
         if testimonial is not None: 
             dfs.append([testimonial, estab, browser.current_url])
-
-
-        if iCounter !=-1 and iCounter > stopEarly:
-            break
-
         
     # Produce dataframe from list
     df = pd.DataFrame(data=dfs, columns=colNames)
