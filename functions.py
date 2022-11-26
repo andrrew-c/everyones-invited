@@ -155,3 +155,35 @@ def scrollDown(driver):
             else: 
                 # Update previous (last) height
                 last_height = new_height
+
+
+    # Get pages
+    def processSingleTestimonial(blue):
+
+        """ A blue is a single 'blue' frame (cell) that holds a testimonial
+            Returns a tuple (testimonial, estab) holding the text of the testimonial and the
+                name of the establishment (this second element has since been removed from the website)
+            
+        """
+
+        # Initialise text and establishment
+        text = ''
+        estab = ''
+
+        # texts
+        texts = blue.find_elements(By.XPATH, ".//p[@class='preFade fadeIn']")
+
+        # If there is text
+        if len(texts) > 0:
+
+            # Testimonial (extract)
+            text = texts[0].text
+
+            if len(texts)>1:
+                estab = texts[1].text
+        
+            # Append next testimonial to a list
+            return text, estab
+        else:
+            return None, None
+            
