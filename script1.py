@@ -1,7 +1,7 @@
 import requests
 
 # Custom functions
-from functions import initbrowser, findPageLinks, scrollDown
+from functions import initbrowser, findPageLinks, getTestimonials
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -47,55 +47,10 @@ if __name__ == "__main__":
     # Init DF
     df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
 
-    def getTestimonials(browser, colNames, firstPage=False):
-
-        """ On a single browser page, scroll down collecting each testimonial
-            Returns a pandas dataframe 
-
-            Scrolls down to the end of the page and then processes each blue frame (a blue)
-
-        """
-
-        # Initialise list of dataframe rows
-        dfs = []
-
-        # 
-        if not firstPage:
-            print("Not first page")
-        
-        # First page
-        else:
-
-            # Print message
-            print("First page: Go to top of page")
-            browser.execute_script("window.scrollTo(0, 0)")
-            time.sleep(1.5)
-
-        # Scroll down entire page, loading up testimonials
-        print(f"Scrolling page: {browser.current_url}")
-        scrollDown(browser)
-
-        # Get testimonials - in blue frames
-        blues = browser.find_elements(By.XPATH, "//div[@class='sqs-block-content']")
-        
-
-        # For each (blue) cell - get testimonial
-        for blue in blues:
-
-            # Process a single blue frame, looking for testimonials
-            testimonial, estab = processSingleTestimonial(blue)
-
-            # If a testimonial was returned, add it to the list
-            if testimonial is not None: 
-                dfs.append([testimonial, estab, browser.current_url])
-
-            
-        # Produce dataframe from list
-        df = pd.DataFrame(data=dfs, columns=colNames)
-        return df
-
+    # Stop after n iterations
+    stopEarly = 3
     # Main loop
-    do while True:
+    while True:
 
         # Get testimonials from a single page
         pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
