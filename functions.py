@@ -115,17 +115,11 @@ def findPageLinks(browser):
         while True:
             browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
             # Scroll up until you find pages
-            nextPage = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")[0]
-            return nextPage
+            nextPage = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")
 
-            # Get hrefs (urls)
-            # nextPage = [p.get_property('href') for p in pages if not re.search('Read|^$', p.text, re.I)]
+            if len(nextPage) > 0:
+                return nextPage
 
-            # Reverse list
-            #pages = pages[::-1]
-            numpages = len(pages)
-            if numpages > 0:
-                return pages
 
 def scrollDown(driver):
     """Credit: https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python"""
