@@ -108,14 +108,24 @@ def initbrowser(url=None, hidebrowser=False):
 
 def findPageLinks(browser):
 
+
+        """
+            Find out whether the end of the page has:
+                "Previous page" only,
+                "Next page" only, or
+                both of the above
+
+        """
+
         # Go to bottom of page
         browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         time.sleep(2)
         while True:
             browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
-            # Scroll up until you find pages
-            nextPage = browser.find_elements(By.XPATH, "//a[contains(@href, 'read-test')]")
+            
+            # Scroll up until you find 'Previous' or 'Next' page
+            nextPage = browser.find_elements(By.XPATH, "//a[contains(text(), 'Next') or contains(text(), 'Previous')]"); len(nextPage)
 
             if len(nextPage) > 0:
                 return nextPage
