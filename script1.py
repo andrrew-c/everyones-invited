@@ -32,58 +32,59 @@ if __name__ == "__main__":
     # Open browser on home page
     browser = initbrowser(url_home)
 
-    # Sleep while browser loads
-    timesleep = 5
-    for i in range(timesleep):
-        print(f"Sleep: {i} of {timesleep}")
-        time.sleep(1)
-
-
     # Get rid of the splash page, if it is there
-    dealWithSplashPage(browser)
+    dealWithSplashPage(browser, 2)
 
     # Get page body
     body = browser.find_element(By.XPATH, "//body")
 
+    iIterations = 0
     # Main loop
     # while True:
-
-    # Get testimonials from a single page
-    pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
-
-    # Add to existing dataframe
-    df = pd.concat([df, pageTestimonials])
 
     # Get next page
     pageLinks = findPageLinks(browser)
 
-    # Check if no nextPage
+    # Get testimonials from a single page
+    # pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
 
+    # Add to existing dataframe
+    # df = pd.concat([df, pageTestimonials])
     def checkNoNextPage(pageLinks):
 
-        """ List of Selenium objects
-            Return True if no 'next page' link to select
-        """
+    """ List of Selenium objects
+        Return True if no 'next page' link to select
+    """
 
-        # Next page items
-        npItems = [p for p in pageLinks if('Next' in p.text)]
-        if len(npItems)>0:
-            return False
-        else:
-            return True
-
+    # Next page items
+    npItems = [p for p in pageLinks if('Next' in p.text)]
+    if len(npItems)>0:
+        return False
+    else:
+        return True
     # This is the last page?
     thisIsLastPage = checkNoNextPage(pageLinks)
 
     if not thisIsLastPage:
         # Click next page
-        [p for p in pageLinks if ('Next' in p.text)][0].click()
+        nextPage = [p for p in pageLinks if ('Next Page' in p.text)][0]
+
+        # Get location
+        nextPageLoc = nextPage.location
+        
+        # Move browser to that location
+        browser.execute_script(f"window.scrollTo(0, {nextPageLoc['y']})")
+        nextPage.click()
+
+    # Else, we have reached the last page
+    else:
+
 
 
 
     # Click next page
-    if len(nextPage)==1:
-        nextPage[0].click()
+    # if len(nextPage)==1:
+    #     nextPage[0].click()
 
     # break
 
