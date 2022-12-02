@@ -1,8 +1,14 @@
 import requests
 
 # Custom functions
-from functions import initbrowser, findPageLinks, getTestimonials
+
+# Browser related function
+from functions import initbrowser
 from functions import dealWithSplashPage
+from functions import findPageLinks, checkNoNextPage, clickNextPage
+
+# Getting the testimonials
+from functions import getTestimonials
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -24,7 +30,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
 
     # Stop after n iterations
-    stopEarly = 3
+    stopEarly = 1
 
     ## Date in yyyy-mm-dd format
     date = datetime.now().strftime("%Y-%m-%d")
@@ -38,38 +44,35 @@ if __name__ == "__main__":
     # Get page body
     body = browser.find_element(By.XPATH, "//body")
 
-    iIterations = 0
+    iIterations = 1
     # Main loop
-    # while True:
+    while True:
 
-    # Get next page
-    pageLinks = findPageLinks(browser)
+        # Get testimonials from a single page
+        pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
 
-    # Get testimonials from a single page
-    # pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
+        # Add to existing dataframe
+        df = pd.concat([df, pageTestimonials])
 
-    # Add to existing dataframe
-    # df = pd.concat([df, pageTestimonials])
-   
-    # This is the last page?
-    thisIsLastPage = checkNoNextPage(pageLinks)
+        # Get next page
+        pageLinks = findPageLinks(browser)
+    
+        # Get boolean to tell us whether this is the last page (whether we can find a 'next page')
+        thisIsLastPage = checkNoNextPage(pageLinks)
+        print(f"stopEarly = {stopEarly} and iIterations = {iIterations}")
+        # If user wants to stop early
+        if iIterations > stopEarly or thisIsLastPage:
+            print("Stopping loop")
+            break
+        # Else, if not on last page
+        elif not thisIsLastPage or iIterations > stopEarly:
 
-    if not thisIsLastPage:
-        # We can click the next page
-        clickNextPage()
-    # Else, we have reached the last page
-    else:
-        # We leave the loop
-        break
+            # Update count of iterations
+            iIterations += 1
 
-
-
-    # Click next page
-    # if len(nextPage)==1:
-    #     nextPage[0].click()
-
-    # break
+            # We can click the next page
+            clickNextPage(browser, pageLinks)
 
     # Output to csv
-    # print("Let us save a text file with the data")
-    # df.to_csv('testimonials-{}.txt'.format(date), sep='|', index=False)
+    print("Let us save a text file with the data")
+    df.to_csv('testimonials-{}.txt'.format(date), sep='|', index=False)
