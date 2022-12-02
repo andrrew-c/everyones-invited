@@ -149,7 +149,7 @@ def findPageLinks(browser):
 
             # print("Scroll up")
             browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
-            time.sleep(0.2)
+            time.sleep(1)
             # Scroll up until you find 'Previous' or 'Next' page
             pageLinks = browser.find_elements(By.XPATH, "//a[contains(text(), 'Next Page')]")
 
@@ -202,6 +202,11 @@ def processSingleTestimonial(blue):
         
     """
 
+
+    # Regex - get text between quotes
+    # Optional quotes
+    rgx_quote = re.compile("""(?<=")?.+(?=")?""")
+    
     # Initialise text and establishment
     text = ''
     estab = ''
@@ -286,7 +291,7 @@ def checkNoNextPage(pageLinks):
         return True
 
 
-def clickNextPage(browser, pageLink):
+def clickNextPage(browser, pageLinks):
     """ Not as simple as just clicking
         We need to locate and move browser to link
     """
