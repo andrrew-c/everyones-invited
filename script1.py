@@ -59,6 +59,7 @@ if __name__ == "__main__":
         clickNextPage()
     # Else, we have reached the last page
     else:
+        # We leave the loop
         break
 
 
