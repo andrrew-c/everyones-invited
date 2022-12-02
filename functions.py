@@ -284,3 +284,18 @@ def getTestimonials(browser, colNames, firstPage=False):
         return False
     else:
         return True
+
+
+def clickNextPage(browser, pageLink):
+    """ Not as simple as just clicking
+        We need to locate and move browser to link
+    """
+    # Click next page
+    nextPage = [p for p in pageLinks if ('Next Page' in p.text)][0]
+
+    # Get location
+    nextPageLoc = nextPage.location
+    
+    # Move browser to that location
+    browser.execute_script(f"window.scrollTo(0, {nextPageLoc['y']})")
+    nextPage.click()

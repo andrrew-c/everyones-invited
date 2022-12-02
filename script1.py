@@ -50,35 +50,16 @@ if __name__ == "__main__":
 
     # Add to existing dataframe
     # df = pd.concat([df, pageTestimonials])
-    def checkNoNextPage(pageLinks):
-
-    """ List of Selenium objects
-        Return True if no 'next page' link to select
-    """
-
-    # Next page items
-    npItems = [p for p in pageLinks if('Next' in p.text)]
-    if len(npItems)>0:
-        return False
-    else:
-        return True
+   
     # This is the last page?
     thisIsLastPage = checkNoNextPage(pageLinks)
 
     if not thisIsLastPage:
-        # Click next page
-        nextPage = [p for p in pageLinks if ('Next Page' in p.text)][0]
-
-        # Get location
-        nextPageLoc = nextPage.location
-        
-        # Move browser to that location
-        browser.execute_script(f"window.scrollTo(0, {nextPageLoc['y']})")
-        nextPage.click()
-
+        # We can click the next page
+        clickNextPage()
     # Else, we have reached the last page
     else:
-
+        break
 
 
 
