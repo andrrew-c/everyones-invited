@@ -108,13 +108,18 @@ def initbrowser(url=None, hidebrowser=False):
         browser.get(url)
     return browser
 
-def dealWithSplashPage(browser):
+def dealWithSplashPage(browser, timesleep=5):
 
     """ Specific to everyone's invited
 
         Tries to close the splash page by selecting a cross (sqs-popup-overlay-close)
         If it can't be found - pass
     """
+
+    # Give time for the page to load up
+    for i in range(timesleep):
+        print(f"Sleep: {i} of {timesleep}")
+        time.sleep(1)
 
     try:
         # Click away splash page
@@ -141,13 +146,20 @@ def findPageLinks(browser):
 
         time.sleep(2)
         while True:
-            browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
-            
-            # Scroll up until you find 'Previous' or 'Next' page
-            nextPage = browser.find_elements(By.XPATH, "//a[contains(text(), 'Next') or contains(text(), 'Previous')]"); len(nextPage)
 
-            if len(nextPage) > 0:
-                return nextPage
+            # print("Scroll up")
+            browser.execute_script("window.scrollTo(0, window.scrollY - 300)")
+            time.sleep(0.2)
+            # Scroll up until you find 'Previous' or 'Next' page
+            pageLinks = browser.find_elements(By.XPATH, "//a[contains(text(), 'Next Page')]")
+
+            # Remove items with no text
+            pageLinks = [p for p in pageLinks if(p.text!='')]
+
+            if len(pageLinks) > 0:
+                
+                print(f"Text in pageLinks = {[p.text for p in pageLinks]}")
+                return pageLinks
 
 
 def scrollDown(driver):
@@ -259,3 +271,6 @@ def getTestimonials(browser, colNames, firstPage=False):
     # Produce dataframe from list
     df = pd.DataFrame(data=dfs, columns=colNames)
     return df
+
+
+
