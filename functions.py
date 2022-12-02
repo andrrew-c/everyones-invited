@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 import re
 import pandas as pd
 
+
+
 def initbrowser(url=None, hidebrowser=False):
 
     """
@@ -105,6 +107,23 @@ def initbrowser(url=None, hidebrowser=False):
     if url != None:
         browser.get(url)
     return browser
+
+def dealWithSplashPage(browser):
+
+    """ Specific to everyone's invited
+
+        Tries to close the splash page by selecting a cross (sqs-popup-overlay-close)
+        If it can't be found - pass
+    """
+
+    try:
+        # Click away splash page
+        btn_splash = browser.find_element(By.XPATH, "//a[@class='sqs-popup-overlay-close']")
+        print("Closing splash screen")
+        # Click it
+        btn_splash.click()
+    except:
+        pass
 
 def findPageLinks(browser):
 
