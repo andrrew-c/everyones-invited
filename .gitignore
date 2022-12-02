@@ -7,3 +7,5 @@ chromedriver/
 
 # Specific constants I do not wanted uploaded to git
 mysecrets.py
+
+*.txt, *.csv
