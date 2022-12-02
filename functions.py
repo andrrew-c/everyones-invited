@@ -272,5 +272,15 @@ def getTestimonials(browser, colNames, firstPage=False):
     df = pd.DataFrame(data=dfs, columns=colNames)
     return df
 
+ def checkNoNextPage(pageLinks):
 
+    """ List of Selenium objects
+        Return True if no 'next page' link to select
+    """
 
+    # Next page items
+    npItems = [p for p in pageLinks if('Next' in p.text)]
+    if len(npItems)>0:
+        return False
+    else:
+        return True
