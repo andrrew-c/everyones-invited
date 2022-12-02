@@ -2,6 +2,7 @@ import requests
 
 # Custom functions
 from functions import initbrowser, findPageLinks, getTestimonials
+from functions import dealWithSplashPage
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -19,6 +20,12 @@ if __name__ == "__main__":
     #url_home = "https://www.everyonesinvited.uk/"
     url_home = "https://www.everyonesinvited.uk/read"
 
+    # Init DF
+    df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
+
+    # Stop after n iterations
+    stopEarly = 3
+
     ## Date in yyyy-mm-dd format
     date = datetime.now().strftime("%Y-%m-%d")
 
@@ -32,40 +39,53 @@ if __name__ == "__main__":
         time.sleep(1)
 
 
-    try:
-        # Click away splash page
-        btn_splash = browser.find_element(By.XPATH, "//a[@class='sqs-popup-overlay-close']")
-        print("Closing splash screen")
-        # Click it
-        btn_splash.click()
-    except:
-        pass
+    # Get rid of the splash page, if it is there
+    dealWithSplashPage(browser)
 
     # Get page body
     body = browser.find_element(By.XPATH, "//body")
 
-    # Init DF
-    df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
-
-    # Stop after n iterations
-    stopEarly = 3
     # Main loop
-    while True:
+    # while True:
 
-        # Get testimonials from a single page
-        pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
+    # Get testimonials from a single page
+    pageTestimonials = getTestimonials(browser, colNames=df.columns, firstPage=True)
 
-        # Add to existing dataframe
-        df = pd.concat([df, pageTestimonials])
+    # Add to existing dataframe
+    df = pd.concat([df, pageTestimonials])
 
-        # Get next page
-        nextPage = findPageLinks(browser)
+    # Get next page
+    pageLinks = findPageLinks(browser)
 
+    # Check if no nextPage
+
+    def checkNoNextPage(pageLinks):
+
+        """ List of Selenium objects
+            Return True if no 'next page' link to select
+        """
+
+        # Next page items
+        npItems = [p for p in pageLinks if('Next' in p.text)]
+        if len(npItems)>0:
+            return False
+        else:
+            return True
+
+    # This is the last page?
+    thisIsLastPage = checkNoNextPage(pageLinks)
+
+    if not thisIsLastPage:
         # Click next page
-        if len(nextPage)==1:
-            nextPage[0].click()
+        [p for p in pageLinks if ('Next' in p.text)][0].click()
 
-        break
+
+
+    # Click next page
+    if len(nextPage)==1:
+        nextPage[0].click()
+
+    # break
 
     # Output to csv
     # print("Let us save a text file with the data")
