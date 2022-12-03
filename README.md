@@ -5,6 +5,7 @@
 ## Dependencies
 
 Uses chrome driver selenium - 
+Xvfb
 Pandas
 
 See `requirements.txt`
