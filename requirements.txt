@@ -1,5 +1,6 @@
 requests
 selenium
+webdriver-manager
 pandas
 pyvirtualdisplay
 
