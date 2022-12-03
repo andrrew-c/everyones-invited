@@ -71,7 +71,7 @@ def initbrowser(url=None, hidebrowser=False):
         display = Display(visible=0, size=disp_size)
         display.start()
         
-        browser = webdriver.Chrome(driver_path, chrome_options=options)
+        browser = webdriver.Chrome(driver_path, options=options)
     
     ###############################################
     ## Mac 
@@ -204,8 +204,8 @@ def processSingleTestimonial(blue):
 
 
     # Regex - get text between quotes
-    # Optional quotes
-    rgx_quote = re.compile("""(?<=")?.+(?=")?""")
+    # Remove quotes at start and end
+    rgx_quote = re.compile('(?<=^").+(?="$)')
     
     # Initialise text and establishment
     text = ''
@@ -218,8 +218,13 @@ def processSingleTestimonial(blue):
     if len(texts) > 0:
 
         # Testimonial (extract)
-        text = texts[0].text
-
+        text = '\n'.join(t.text for t in texts]
+        #text = texts[0].text
+        
+        try:
+            text = rgx_quote.findall(text)[0]
+        except:
+            print(text)
         if len(texts)>1:
             estab = texts[1].text
     
