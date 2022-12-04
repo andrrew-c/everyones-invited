@@ -1,7 +1,7 @@
 import requests
 
 # Custom functions
-
+from functions import script1_parser
 # Browser related function
 from functions import initbrowser
 from functions import dealWithSplashPage
@@ -22,15 +22,17 @@ import pandas as pd
 import re
 
 if __name__ == "__main__":
-        
-    #url_home = "https://www.everyonesinvited.uk/"
+
+    # Load up system arguments, etc.
+    parser = script1_parser()
+
+    myargs = parser.parse_args()
+
+    # URL for scraping
     url_home = "https://www.everyonesinvited.uk/read"
 
     # Init DF
     df = pd.DataFrame(data=None, columns='text,establishment,url'.split(','))
-
-    # Stop after n iterations
-    stopEarly = 1
 
     ## Date in yyyy-mm-dd format
     date = datetime.now().strftime("%Y-%m-%d")
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     # Get page body
     body = browser.find_element(By.XPATH, "//body")
 
-    iIterations = 1
+    iIterations = 0
     # Main loop
     while True:
 
@@ -59,19 +61,23 @@ if __name__ == "__main__":
     
         # Get boolean to tell us whether this is the last page (whether we can find a 'next page')
         thisIsLastPage = checkNoNextPage(pageLinks)
-        print(f"stopEarly = {stopEarly} and iIterations = {iIterations}")
+        
+
         # If user wants to stop early
-        if iIterations > stopEarly or thisIsLastPage:
-            print("Stopping loop")
-            break
-        # Else, if not on last page
-        elif not thisIsLastPage or iIterations > stopEarly:
+        if myargs.stopEarly is not None: 
 
-            # Update count of iterations
-            iIterations += 1
+            print(f"stopEarly = {myargs.stopEarly} and iIterations = {iIterations}")
+            if iIterations > myargs.stopEarly or thisIsLastPage:
+                print("Stopping loop")
+                break
+            # Else, if not on last page
+            elif not thisIsLastPage or iIterations > myargs.stopEarly:
 
-            # We can click the next page
-            clickNextPage(browser, pageLinks)
+                # Update count of iterations
+                iIterations += 1
+
+                # We can click the next page
+                clickNextPage(browser, pageLinks)
 
     # Output to csv
     print("Let us save a text file with the data")
