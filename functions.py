@@ -3,8 +3,29 @@ import time
 from selenium.webdriver.common.by import By
 import re
 import pandas as pd
+import argparse
+
+def script1_parser():
+
+    """ Script 1 specific parser"""
+    parser = argparse.ArgumentParser(
+                    prog = 'everyones-invited: script1.py',
+                    description = 'Load up a browser and scrape testimonials',
+                    epilog = '')
+
+    parser = create_parser(parser)
+    return parser
+        
 
 
+# System arguments
+def create_parser(parser):
+
+    """ Add arguments common across scripts"""
+
+    parser.add_argument('-s', '--stop-early', dest='stopEarly', type=int, help='An (optional) integer to determine the number of pages to process. If missing continues till pages run out.')
+
+    return parser
 
 def initbrowser(url=None, hidebrowser=False):
 
@@ -218,9 +239,9 @@ def processSingleTestimonial(blue):
     if len(texts) > 0:
 
         # Testimonial (extract)
-        text = '\n'.join(t.text for t in texts]
+        text = '\n'.join(t.text for t in texts if t.text!='')
         #text = texts[0].text
-        
+
         try:
             text = rgx_quote.findall(text)[0]
         except:
